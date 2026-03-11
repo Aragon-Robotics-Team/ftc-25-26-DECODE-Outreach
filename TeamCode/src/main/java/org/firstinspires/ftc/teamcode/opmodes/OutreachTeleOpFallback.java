@@ -506,9 +506,9 @@ public class OutreachTeleOpFallback extends CommandOpMode {
         );
     }
     void handleTeleopDrive() {
-        double y = driver1.getLeftY();
-        double x = driver1.getLeftX();
-        double rx = -driver1.getRightX() * (slowMode ? 0.3 : 1.2);
+        double y = driver1.getLeftY() * 0.5;
+        double x = driver1.getLeftX() * 0.5;
+        double rx = -driver1.getRightX() * (slowMode ? 0.3 : 0.7);
 
         double controlHeading = follower.getHeading() - headingOffset;
 
