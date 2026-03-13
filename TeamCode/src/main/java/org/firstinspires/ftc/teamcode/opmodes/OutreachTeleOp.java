@@ -106,17 +106,24 @@ public class OutreachTeleOp extends CommandOpMode {
         //driver 1
         driver1.getGamepadButton(GamepadKeys.Button.TRIANGLE).whenPressed(
                 new InstantCommand(() -> {
-                    if (intakeState == IntakeState.INTAKEIN_ROLLERSIN) intakeState = IntakeState.INTAKESTILL_ROLLERSIN;
+                    if (intakeState == IntakeState.INTAKEIN_ROLLERSIN || intakeState == IntakeState.INTAKEOUT_ROLLERSIN) intakeState = IntakeState.INTAKESTILL_ROLLERSIN;
                     else intakeState = IntakeState.INTAKEIN_ROLLERSIN;
                     new SelectCommand(this::getIntakeCommand).schedule();
                 })
         );
-        driver1.getGamepadButton(GamepadKeys.Button.CIRCLE).whenPressed(
+        driver1.getGamepadButton(GamepadKeys.Button.CROSS).whenPressed(
+                new InstantCommand(() -> {
+                    if (intakeState == IntakeState.INTAKEIN_ROLLERSIN || intakeState == IntakeState.INTAKEOUT_ROLLERSIN) intakeState = IntakeState.INTAKESTILL_ROLLERSIN;
+                    else intakeState = IntakeState.INTAKEOUT_ROLLERSIN;
+                    new SelectCommand(this::getIntakeCommand).schedule();
+                })
+        );
+        driver2.getGamepadButton(GamepadKeys.Button.CIRCLE).whenPressed(
                 new InstantCommand(() -> {
                     spindexer.moveSpindexerBy(120);
                 })
         );
-        driver1.getGamepadButton(GamepadKeys.Button.SQUARE).whenPressed(
+        driver2.getGamepadButton(GamepadKeys.Button.SQUARE).whenPressed(
                 new InstantCommand(() -> {
                     if (intakeState == IntakeState.INTAKEOUT_ROLLERSOUT) intakeState = IntakeState.INTAKESTILL_ROLLERSIN;
                     else {
@@ -128,23 +135,23 @@ public class OutreachTeleOp extends CommandOpMode {
         );
         new Trigger(() -> driver1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5)
                 .whenActive(new InstantCommand(() -> {
-                    if (shootState == ShootState.SHOOTING) {
+                    if (shootState == ShootState.SHOOTING || shootState == ShootState.IDK) {
                         spindexer.moveSpindexerBy(360);
                     }
                 }));
 
         //changes shooting state
-        driver2.getGamepadButton(GamepadKeys.Button.TRIANGLE).whenPressed(
+        driver2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
                 new InstantCommand(() -> {
                     shootState = ShootState.IDLE;
                 })
         );
-        driver2.getGamepadButton(GamepadKeys.Button.CROSS).whenPressed(
+        driver2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(
                 new InstantCommand(() -> {
                     shootState = ShootState.SHOOTING;
                 })
         );
-        driver2.getGamepadButton(GamepadKeys.Button.CIRCLE).whenPressed(
+        driver2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
                 new InstantCommand(() -> {
                     shootState = ShootState.IDK;
                 })
@@ -152,12 +159,12 @@ public class OutreachTeleOp extends CommandOpMode {
     }
 
     public void handleTeleOpDrive() {
-        double y = driver1.getLeftY()*0.5;
-        double x = driver1.getLeftX()*0.5;
-        double rx = -driver1.getRightX()*0.5;
+        double y = driver1.getLeftY()*0.7;
+        double x = -driver1.getLeftX()*0.7;
+        double rx = -driver1.getRightX()*0.4;
         double denominator = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(rx), 1.0);
 
-        follower.setTeleOpDrive(x/denominator, y/denominator, rx/denominator, true);
+        follower.setTeleOpDrive(y/denominator, x/denominator, rx/denominator, true);
     }
 
     public void handleShootState() {
@@ -171,7 +178,7 @@ public class OutreachTeleOp extends CommandOpMode {
                 gate.down();
                 break;
             case IDK:
-                shooter.setTargetLinearSpeed(99999);
+                shooter.setTargetLinearSpeed(700);
                 gate.down();
                 break;
 
